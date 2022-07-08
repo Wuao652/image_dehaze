@@ -57,7 +57,7 @@ def get_laplacian(img):
     ind_mat = np.arange(img_size).reshape((W, H)).T
     indices = np.arange(img_size)
     num_ind = indices.shape[0]
-    max_num_vertex = max_num_neigh * num_ind
+    max_num_vertex = max_num_neigh * max_num_neigh * num_ind
 
     row_inds = np.zeros((max_num_vertex, 1))
     col_inds = np.zeros((max_num_vertex, 1))
@@ -92,8 +92,18 @@ def get_laplacian(img):
         win_image = win_image - np.tile(win_mean, (num_neigh, 1))
         win_vals = (1 + win_image @ win_var @ win_image.T) / num_neigh
 
+        # finish computing omega for each image patch
+        # start to construct the Laplacian matrix
+        sub_len = num_neigh * num_neigh
+        win_inds = np.tile(win_inds.reshape((1, -1)), (num_neigh, 1))
+        row_inds[len: len + sub_len, ...] = win_inds.reshape((-1, 1))
+        win_inds = win_inds.T
+        col_inds[len: len + sub_len, ...] = win_inds.reshape((-1, 1))
+        vals[len: len + sub_len, ...] = win_vals.T.reshape((-1, 1))
+        len = len + sub_len
         print("good")
-
+    print(col_inds)
+    print(row_inds)
 
     pass
 
