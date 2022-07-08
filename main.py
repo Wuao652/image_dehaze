@@ -2,6 +2,8 @@ import numpy as np
 import math
 import matplotlib.pyplot as plt
 import cv2
+def ind2sub(H, W, idx):
+    return idx % H, idx // H
 
 def get_dark_channel(img, win_size):
     H, W, C = img.shape
@@ -46,6 +48,51 @@ def get_transmission_estimate(img, atmosphere, omega, win_size):
     trans_est = 1.0 - omega * get_dark_channel(img / A, win_size)
     return trans_est
 
+def get_laplacian(img):
+    H, W, C = img.shape
+    img_size = H * W
+    epsilon = 0.0000001
+    win_rad = 1
+    max_num_neigh = (2 * win_rad + 1) ** 2
+    ind_mat = np.arange(img_size).reshape((W, H)).T
+    indices = np.arange(img_size)
+    num_ind = indices.shape[0]
+    max_num_vertex = max_num_neigh * num_ind
+
+    row_inds = np.zeros((max_num_vertex, 1))
+    col_inds = np.zeros((max_num_vertex, 1))
+    vals = np.zeros((max_num_vertex, 1))
+
+    len = 0
+
+    for k in range(num_ind):
+        print(k)
+        ind = indices[k]
+        i, j = ind2sub(H, W, ind)
+        H_min = max(0, i - win_rad)
+        H_max = min(H, i + win_rad)
+        W_min = max(0, j - win_rad)
+        W_max = min(W, j + win_rad)
+
+        win_inds = ind_mat[H_min: H_max + 1, W_min: W_max + 1]
+        win_inds = win_inds.T.reshape(-1)
+
+        num_neigh = win_inds.size
+
+        win_image = img[H_min: H_max + 1, W_min: W_max + 1, :]
+
+        win_image = np.transpose(win_image, (1, 0, 2)).reshape((-1, C))
+
+        win_mean = np.mean(win_image, axis=0, keepdims=True)
+        win_var = np.linalg.inv(
+            (win_image.T @ win_image / num_neigh)
+            - (win_mean.T @ win_mean)
+            + (epsilon / num_neigh * np.eye(C))
+        )
+        print("good")
+
+
+    pass
 
 def dehaze(image, omega=0.95, win_size=15, Lambda = 0.0001):
     H, W, C = image.shape
@@ -53,6 +100,7 @@ def dehaze(image, omega=0.95, win_size=15, Lambda = 0.0001):
     atmosphere = get_atmosphere(image, dark_channel)
     print(atmosphere)
     trans_est = get_transmission_estimate(image, atmosphere, omega, win_size)
+    L = get_laplacian(image)
 
     # plt.imshow(dark_channel)
     # plt.show()
