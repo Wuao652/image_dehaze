@@ -89,6 +89,9 @@ def get_laplacian(img):
             - (win_mean.T @ win_mean)
             + (epsilon / num_neigh * np.eye(C))
         )
+        win_image = win_image - np.tile(win_mean, (num_neigh, 1))
+        win_vals = (1 + win_image @ win_var @ win_image.T) / num_neigh
+
         print("good")
 
 
