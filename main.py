@@ -112,6 +112,13 @@ def get_laplacian(img):
     L = D - A
     return L
 
+def get_radiance(img, t, A):
+    H, W, C = img.shape
+    rep_A = np.tile(A.reshape((1, 1, 3)), (H, W, 1))
+    max_t = np.maximum(0.1 * np.ones_like(t), t)
+    radiance = (img - rep_A) / max_t.reshape((H, W, -1)) + rep_A
+    return radiance
+
 def dehaze(image, omega=0.95, win_size=15, Lambda = 0.0001):
     H, W, C = image.shape
     dark_channel = get_dark_channel(image, win_size)
@@ -124,6 +131,8 @@ def dehaze(image, omega=0.95, win_size=15, Lambda = 0.0001):
     b = Lambda * trans_est.T.reshape(-1)
     x = scipy.sparse.linalg.spsolve(A, b)
     transmission = x.reshape((W, H)).T
+
+    radiance = get_radiance(image, transmission, atmosphere)
 
     # plt.imshow(dark_channel)
     # plt.show()
