@@ -2,6 +2,9 @@ import numpy as np
 import math
 import matplotlib.pyplot as plt
 import cv2
+import scipy
+import scipy.sparse.linalg
+
 def ind2sub(H, W, idx):
     return idx % H, idx // H
 
@@ -102,10 +105,12 @@ def get_laplacian(img):
         vals[len: len + sub_len, ...] = win_vals.T.reshape((-1, 1))
         len = len + sub_len
         print("good")
-    print(col_inds)
-    print(row_inds)
 
-    pass
+    A = scipy.sparse.csc_matrix((vals[:len].reshape(-1), (row_inds[:len].reshape(-1), col_inds[:len].reshape(-1))),
+                   shape=(img_size, img_size))
+    D = scipy.sparse.spdiags(A.sum(1).reshape(-1), [0], img_size, img_size)
+    L = D - A
+    return L
 
 def dehaze(image, omega=0.95, win_size=15, Lambda = 0.0001):
     H, W, C = image.shape
@@ -114,6 +119,11 @@ def dehaze(image, omega=0.95, win_size=15, Lambda = 0.0001):
     print(atmosphere)
     trans_est = get_transmission_estimate(image, atmosphere, omega, win_size)
     L = get_laplacian(image)
+
+    A = L + Lambda * scipy.sparse.eye(H * W)
+    b = Lambda * trans_est.T.reshape(-1)
+    x = scipy.sparse.linalg.spsolve(A, b)
+    transmission = x.reshape((W, H)).T
 
     # plt.imshow(dark_channel)
     # plt.show()
