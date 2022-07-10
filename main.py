@@ -33,7 +33,7 @@ def get_dark_channel(img, win_size):
 def get_atmosphere(img, dark):
     H, W, C = img.shape
     n_pixels = H * W
-    n_search_pixels = max(math.floor(n_pixels*0.01), 1)
+    n_search_pixels = max(math.floor(n_pixels*0.001), 1)
     dark_vec = dark.reshape(n_pixels)
     img_vec = img.reshape(n_pixels, -1)
     indices = np.argsort(-dark_vec)
