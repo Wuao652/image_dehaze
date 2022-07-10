@@ -1,6 +1,6 @@
 # single image dehaze
 ## Introduction
-This program implement single image dehazing using dark channel prior. 
+This repo is a python implement of the paper single image haze removal using dark channel prior. 
 
 ## Compile Dependencies
 - OpenCV
@@ -8,8 +8,11 @@ This program implement single image dehazing using dark channel prior.
 
 ## Examples
 <center>
-<img src="./image/15.png"  height = "400" alt="图片名称" />
-<img src="./image/J.png"   height = "400" alt="图片名称" />
+<img src="./results/forest.jpg"   height = "400" alt="hazy image" />
+<img src="./results/dark_channel_image.png"  height = "400" alt="图片名称" />
+<img src="./results/coarse_transmission.png"  height = "400" alt="图片名称" />
+<img src="./results/fine_transmission.png"  height = "400" alt="图片名称" />
+<img src="./results/clear_image.png"  height = "400" alt="图片名称" />
 </center>
 
 
