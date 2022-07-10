@@ -155,9 +155,6 @@ def dehaze(image, omega=0.95, win_size=15, Lambda = 0.0001):
     # 5. get the clear image
     radiance = get_radiance(image, transmission, atmosphere)
 
-    # plt.imshow(dark_channel)
-    # plt.imshow(radiance)
-    # plt.show()
     return radiance, dark_channel, trans_est, transmission, atmosphere
 
 if __name__ == '__main__':
