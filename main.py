@@ -158,14 +158,15 @@ def dehaze(image, omega=0.95, win_size=15, Lambda = 0.0001):
     return radiance, dark_channel, trans_est, transmission, atmosphere
 
 if __name__ == '__main__':
-    img = cv2.imread("./image/forest.jpg")
-    img = img.astype('float64') / 255
-    print(img.shape)
+    # img = cv2.imread("./image/forest.jpg")
+    # img = img.astype('float64') / 255
+    # print(img.shape)
 
-    # img = np.load("./data/forest.npy")
+    img = np.load("./data/forest.npy")
     result, dark, coarse_t, fine_t, A = dehaze(img, 0.95, 15, 0.0001)
-    cv2.imshow("dark", dark)
-    cv2.imshow("coarse_t", coarse_t)
-    cv2.imshow("fine_t", fine_t)
-    cv2.imshow('J', result)
-    cv2.waitKey()
+
+    # cv2.imshow("dark", dark)
+    # cv2.imshow("coarse_t", coarse_t)
+    # cv2.imshow("fine_t", fine_t)
+    # cv2.imshow('J', result)
+    # cv2.waitKey()
