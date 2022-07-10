@@ -120,28 +120,55 @@ def get_radiance(img, t, A):
     return radiance
 
 def dehaze(image, omega=0.95, win_size=15, Lambda = 0.0001):
-    H, W, C = image.shape
-    dark_channel = get_dark_channel(image, win_size)
-    atmosphere = get_atmosphere(image, dark_channel)
-    print(atmosphere)
-    trans_est = get_transmission_estimate(image, atmosphere, omega, win_size)
-    L = get_laplacian(image)
+    """
+    Single image haze removal using Dark Channel Prior.
+    :param image: [H, W, 3] np array of the input hazy image, pixel value in (0, 1).
+    :param omega: default=0.95 constant parameter to keep some haze for a natural looking.
+    :param win_size: default=15 image patch size to estimate the dark channel image.
+    :param Lambda: default=0.0001 regularization in soft matting.
+    :return:
+        radiance: [H, W, 3] np array of the clear image.
+        dark_channel: [H, W] np array of the dark channel image of the input hazy image.
+        trans_est: [H, W] coarse transmission from the dark channel prior equation.
+        transmission: [H, W] fine transmission estimated using soft matting.
+        atmosphere: [1, 3] Ar, Ag, Ab
 
+    """
+    H, W, C = image.shape
+
+    # 1. compute the dark channel image of the input image.
+    dark_channel = get_dark_channel(image, win_size)
+
+    # 2. estimate the atmospheric light
+    atmosphere = get_atmosphere(image, dark_channel)
+
+    # 3. estimate the coarse transmission map
+    trans_est = get_transmission_estimate(image, atmosphere, omega, win_size)
+
+    # 4. refine the transmission map using soft matting
+    L = get_laplacian(image)
     A = L + Lambda * scipy.sparse.eye(H * W)
     b = Lambda * trans_est.T.reshape(-1)
     x = scipy.sparse.linalg.spsolve(A, b)
     transmission = x.reshape((W, H)).T
 
+    # 5. get the clear image
     radiance = get_radiance(image, transmission, atmosphere)
 
     # plt.imshow(dark_channel)
+    # plt.imshow(radiance)
     # plt.show()
-    pass
+    return radiance, dark_channel, trans_est, transmission, atmosphere
+
 if __name__ == '__main__':
+    img = cv2.imread("./image/forest.jpg")
+    img = img.astype('float64') / 255
+    print(img.shape)
 
-    # img = cv2.imread("./image/forest.jpg")
-    # img = img.astype('float64') / 255
-    # print(img.shape)
-
-    img = np.load("./data/forest.npy")
-    result = dehaze(img, 0.95, 15, 0.0001)
+    # img = np.load("./data/forest.npy")
+    result, dark, coarse_t, fine_t, A = dehaze(img, 0.95, 15, 0.0001)
+    cv2.imshow("dark", dark)
+    cv2.imshow("coarse_t", coarse_t)
+    cv2.imshow("fine_t", fine_t)
+    cv2.imshow('J', result)
+    cv2.waitKey()
