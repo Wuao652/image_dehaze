@@ -30,9 +30,9 @@ if __name__ == "__main__":
         # 1. compute the dark channel image of the input image.
         dark_channel = get_dark_channel(img, 15)
         # 2. estimate the atmospheric light
-        atmosphere = get_atmosphere(img, dark_channel)
+        A = get_atmosphere(img, dark_channel)
         # 3. estimate the coarse transmission map
-        coarse_t = get_transmission_estimate(img, atmosphere, 0.95, 15)
+        coarse_t = get_transmission_estimate(img, A, 0.95, 15)
 
         # result, dark, coarse_t, fine_t, A = dehaze(img, 0.95, 15, 0.0001)
         # result = np.clip(result, 0., 1.)
