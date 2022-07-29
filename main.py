@@ -54,7 +54,7 @@ def get_transmission_estimate(img, atmosphere, omega, win_size):
 def get_laplacian(img):
     H, W, C = img.shape
     img_size = H * W
-    epsilon = 0.0000001
+    epsilon = 0.000001
     win_rad = 1
     max_num_neigh = (2 * win_rad + 1) ** 2
     ind_mat = np.arange(img_size).reshape((W, H)).T

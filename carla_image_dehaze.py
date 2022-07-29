@@ -26,8 +26,16 @@ if __name__ == "__main__":
         print(f"start {str(i)} image ======>>>>>>")
         img = cv2.imread(img_files[i]).astype(np.float64) / 255.
         # img = np.load("./data/image.npy")[..., ::-1].astype(np.float64)
-        result, dark, coarse_t, fine_t, A = dehaze(img, 0.95, 15, 0.0001)
-        result = np.clip(result, 0., 1.)
+
+        # 1. compute the dark channel image of the input image.
+        dark_channel = get_dark_channel(img, 15)
+        # 2. estimate the atmospheric light
+        atmosphere = get_atmosphere(img, dark_channel)
+        # 3. estimate the coarse transmission map
+        coarse_t = get_transmission_estimate(img, atmosphere, 0.95, 15)
+
+        # result, dark, coarse_t, fine_t, A = dehaze(img, 0.95, 15, 0.0001)
+        # result = np.clip(result, 0., 1.)
         # cv2.imwrite(f"./carla_results/dark_r_{str(i).zfill(5)}.png", dark * 255.)
         # cv2.imwrite(f"./carla_results/coarse_t_r_{str(i).zfill(5)}.png", coarse_t * 255.)
         # cv2.imwrite(f"./carla_results/fine_t_r_{str(i).zfill(5)}.png", fine_t * 255.)
