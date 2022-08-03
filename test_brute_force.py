@@ -17,7 +17,7 @@ A = get_atmosphere(img, dark_channel)
 # depth
 depth_file = '/home/dennis/carla_to_rosbag/data/img_files/hazy_depth_npy/d_00173.npy'
 depth_map = np.load(depth_file).astype(np.float64)
-trans_map = np.exp(-0.04 * depth_map)
+trans_map = np.exp(-0.025 * depth_map)
 
 radiance = get_radiance(img, trans_map, A)
 plt.figure()

@@ -9,3 +9,4 @@ __pycache__/
 # for carla_dataset
 carla_image_dehaze.py
 carla_results/
+results/
