@@ -44,7 +44,7 @@ print(len(rgb_clear_img_files))
 print(len(depth_img_files))
 
 I, J, d = [], [], []
-for idx in range(50):
+for idx in range(0, cnt, cnt // 30):
     rgb_img = cv2.imread(rgb_img_files[idx]).astype(np.float32) / 255.
     rgb_clear_img = cv2.imread(rgb_clear_img_files[idx]).astype(np.float32) / 255.
     depth_img = np.load(depth_img_files[idx]).astype(np.float32) / 1000.
@@ -54,10 +54,15 @@ for idx in range(50):
     d.append(depth_img)
 
 H, W, C = I[0].shape
+max_depth = d[0].max()
 # N_img * [480, 640, 3]
 I = np.stack(I, axis=0).reshape(-1, C)
 J = np.stack(J, axis=0).reshape(-1, C)
 d = np.stack(d, axis=0).reshape(-1)
+
+I = I[d < max_depth]
+J = J[d < max_depth]
+d = d[d < max_depth]
 
 def fun(x, i, j, d):
     beta, A_r, A_g, A_b = x[0], x[1], x[2], x[3]

@@ -46,6 +46,7 @@ beta, air_light = res_lsq.x[0], res_lsq.x[1:]
 print(beta)
 print(air_light)
 
+# beta, air_light = 38.77924838921209, np.array([0.75376985, 0.7725226, 0.79939912], dtype=np.float32)
 t = np.exp(-beta * depth_map)
 result = (rgb_img - air_light) / t.reshape(H, W, -1) + air_light
 
